@@ -1,0 +1,66 @@
+# archify.yaml — the project tree Archify scaffolds. It's just folders and
+# files; rewrite it into any architecture you want (DDD, MVVM, whatever) —
+# Archify only reads this file, it has no opinions of its own.
+#
+#   folder:                       # nested keys = a folder
+#     file.dart: template_key       # a file, filled with a built-in template
+#     other.dart:                    # blank + has a "." = an empty file
+#     empty_folder:                   # blank + no "." = an empty folder
+#
+# `structure` scaffolds via `dart run archify configure`.
+# `feature_root` + `feature_template` scaffold via `dart run archify generate <name>`
+# (use `{feature_name}` in any key name there).
+#
+# All built-in template keys: `dart run archify templates`
+# Full docs: https://pub.dev/packages/archify
+
+version: 1 # archify.yaml schema version — no need to touch this
+
+# Base project structure — scaffolded by `dart run archify configure`
+structure:
+  lib:
+    core: # app-wide config, api client, shared models
+      api:
+      config:
+      model:
+    feature: # generated features live here
+    shared: # reusable theme, widgets, constants, utils
+      constant:
+        constant.dart: constant
+      path:
+        app_images.dart: path_images
+        app_svg.dart: path_svg
+      theme:
+        app_colors.dart: theme_colors
+        app_themes.dart: theme_themes
+        main_theme.dart: theme_main
+      utils:
+      widget:
+        global:
+          custom_snack_bar.dart: custom_snack_bar
+        loading:
+          loading_dialog.dart: loading_dialog
+    app.dart: app
+    main.dart: main
+    root.dart: root
+
+# Per-feature structure — scaffolded by `dart run archify generate <name>`
+feature_root: lib/feature
+
+feature_template:
+  "{feature_name}":
+    data: # repo/data-source implementations
+      data_source_impl:
+        "{feature_name}_data_source_impl.dart": data_source_impl
+      repo_impl:
+        "{feature_name}_repo_impl.dart": repo_impl
+    domain: # repo/data-source interfaces
+      data_source:
+        "{feature_name}_data_source.dart": data_source
+      repo:
+        "{feature_name}_repo.dart": repo
+    presentation: # screens, widgets, state
+      cubit:
+      page:
+        "{feature_name}_page.dart": page
+      widget:
