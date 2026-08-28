@@ -5,6 +5,8 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color background = Color(0xFFFFF4ED);
+  // Placeholder brand color pending exact Figma "Accent" style value
+  static const Color primary = Color(0xFFE8562F);
   // Add your base colors here
 
   // Accent Colors

@@ -1,5 +1,12 @@
 class AppImages {
   static const String _splashBasePath = 'assets/images/splash';
+  static const String _productBasePath = 'assets/images/product';
+
+  static const List<String> productPizzas = [
+    '$_productBasePath/pizza_1.png',
+    '$_productBasePath/pizza_2.png',
+    '$_productBasePath/pizza_3.png',
+  ];
 
   // Cumulative pizza-assembly frames: splashFrames[0] is empty,
   // each next frame has one more slice already placed, splashFrames.last is the full pizza.
