@@ -63,9 +63,10 @@ class SplashIntroAnimation {
   /// Assembly progress, eased, spanning the whole logo phase.
   double assemblyT(double t) => Curves.easeOut.transform((t / assemblyEnd).clamp(0.0, 1.0));
 
-  /// Assembled-logo size, as a fraction of screen width: grows from a sliver
-  /// up to the resting splash-logo size as slices are added.
-  double assemblySizeFactor(double t) => 0.16 + 0.56 * assemblyT(t);
+  /// Assembled-logo size, as a fraction of screen width: fixed at the
+  /// resting splash-logo size for the whole assembly phase — slices reveal
+  /// in place rather than the logo scaling up as they're added.
+  double assemblySizeFactor(double t) => 0.72;
 
   /// Fades the assembled logo out once the background starts tinting peach.
   double pizzaFadeOpacity(double t) {
