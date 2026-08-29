@@ -159,22 +159,39 @@ class _SplashScreenState extends State<SplashScreen>
         return Scaffold(
           backgroundColor: _bgColor(t),
           body: SafeArea(
-            child: Column(
+            child: Stack(
               children: [
-                _buildNavbar(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildPizzaStage(width, t),
-                      _buildSizeArea(),
-                      const SizedBox(height: 20),
-                      _buildDescription(),
-                      const SizedBox(height: 20),
-                      _buildOrderRow(),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
+                Column(
+                  children: [
+                    _buildNavbar(),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _buildPizzaStage(width, t),
+                          _buildSizeArea(),
+                          const SizedBox(height: 20),
+                          _buildDescription(),
+                          const SizedBox(height: 20),
+                          _buildOrderRow(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+                // Rendered independently of the layout above, centered on the
+                // full screen like a conventional splash logo — the lower
+                // rows already reserve their final resting space even while
+                // invisible, which would otherwise pin this to the top.
+                if (t < _pizzaFadeEnd)
+                  Positioned.fill(
+                    child: Center(
+                      child: Opacity(
+                        opacity: _pizzaFadeOpacity(t),
+                        child: _assemblyPizza(width, t),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -312,12 +329,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ],
-          if (showAssembly)
-            Opacity(
-              opacity: _pizzaFadeOpacity(t),
-              child: _assemblyPizza(width, t),
-            )
-          else
+          if (!showAssembly)
             Opacity(
               opacity: _peekIn.value,
               child: Hero(
