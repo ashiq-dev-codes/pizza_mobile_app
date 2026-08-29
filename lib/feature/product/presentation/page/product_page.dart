@@ -321,7 +321,7 @@ class _SizeArea extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _ArcText(
+                ArcText(
                   text: 'Banana for scale',
                   radius: 58,
                   style: TextStyle(
@@ -498,9 +498,11 @@ class _AddButton extends StatelessWidget {
 }
 
 /// Lays out [text] one letter at a time along an upward arc, matching the
-/// "Banana for scale" caption from the Figma design.
-class _ArcText extends StatelessWidget {
-  const _ArcText({
+/// "Banana for scale" caption from the Figma design. Shared with the splash
+/// screen so the banana caption is identical during its entrance animation.
+class ArcText extends StatelessWidget {
+  const ArcText({
+    super.key,
     required this.text,
     required this.style,
     required this.radius,
