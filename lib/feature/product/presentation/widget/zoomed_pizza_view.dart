@@ -15,7 +15,7 @@ class ZoomedPizzaView extends StatelessWidget {
           child: Hero(
             tag: ProductConstants.pizzaHeroTag,
             child: Image.asset(
-              AppImages.productPizzas.first,
+              AppImages.productPizzas[1],
               width: MediaQuery.sizeOf(context).width,
               fit: BoxFit.contain,
             ),

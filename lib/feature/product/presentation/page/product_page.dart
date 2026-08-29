@@ -51,7 +51,11 @@ class _ProductScreenState extends State<ProductScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    PizzaStage(width: width, selectedSize: _selectedSize, onTapZoom: _openZoom),
+                    PizzaStage(
+                      width: width,
+                      selectedSize: _selectedSize,
+                      onTapZoom: _openZoom,
+                    ),
                     SizeArea(
                       selectedSize: _selectedSize,
                       onSelect: (size) => setState(() => _selectedSize = size),
@@ -61,7 +65,11 @@ class _ProductScreenState extends State<ProductScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
                         ProductConstants.description,
-                        style: TextStyle(fontSize: 14, height: 1.7, color: AppColors.black),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.7,
+                          color: AppColors.black,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

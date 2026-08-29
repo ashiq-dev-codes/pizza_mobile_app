@@ -40,7 +40,7 @@ class PizzaStage extends StatelessWidget {
           Positioned(
             left: -peekOffset,
             child: Image.asset(
-              AppImages.productPizzas[1],
+              AppImages.productPizzas[0],
               width: peekSize,
               height: peekSize,
               fit: BoxFit.contain,
@@ -65,7 +65,7 @@ class PizzaStage extends StatelessWidget {
                 width: pizzaSize,
                 height: pizzaSize,
                 child: Image.asset(
-                  AppImages.productPizzas.first,
+                  AppImages.productPizzas[1],
                   fit: BoxFit.contain,
                 ),
               ),

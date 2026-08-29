@@ -25,11 +25,13 @@ class SplashIntroAnimation {
     // Hand-off cascade: the hero pizza pops in first, then the rest of the
     // product chrome follows behind it — header first, with a 50ms stagger,
     // then the size selector and description, with the order row settling
-    // last (all clear of the 900ms mark, so nothing pops on the swap).
-    navbarIn = _reveal(afterHeroMs: 50, durationMs: 180);
-    bananaSizeIn = _reveal(afterHeroMs: 100, durationMs: 180);
-    descriptionIn = _reveal(afterHeroMs: 150, durationMs: 170);
-    orderRowIn = _reveal(afterHeroMs: 180, durationMs: 140);
+    // last. Each element keeps a full ~170-180ms glide (rather than being
+    // compressed to fit), and all of them clear their rest state well
+    // before the 900ms mark so nothing pops on the swap to the product page.
+    navbarIn = _reveal(afterHeroMs: 50, durationMs: 170);
+    bananaSizeIn = _reveal(afterHeroMs: 90, durationMs: 180);
+    descriptionIn = _reveal(afterHeroMs: 130, durationMs: 175);
+    orderRowIn = _reveal(afterHeroMs: 150, durationMs: 165);
   }
 
   static const _totalDuration = Duration(milliseconds: 900);
@@ -105,10 +107,13 @@ class SplashIntroAnimation {
     return Curves.easeInOut.transform(localT) * 4.2;
   }
 
-  /// Hero pizza size, as a fraction of screen width: pops in to its resting
-  /// size ([restingWidthFactor]) once the wipe has mostly covered the screen.
-  double heroSizeFactor(double t, double restingWidthFactor) {
+  /// Hero pizza's pop-in scale (0→1), once the wipe has mostly covered the
+  /// screen. Meant to drive a `Transform.scale` on a fixed-size child rather
+  /// than the child's actual width/height, so the pop is a cheap paint-time
+  /// transform instead of a per-frame relayout — and shares the same ease as
+  /// the rest of the reveal cascade so nothing reads as the odd one out.
+  double heroScale(double t) {
     final localT = ((t - heroStart) / (heroEnd - heroStart)).clamp(0.0, 1.0);
-    return Curves.easeOutBack.transform(localT) * restingWidthFactor;
+    return Curves.easeOutCubic.transform(localT);
   }
 }

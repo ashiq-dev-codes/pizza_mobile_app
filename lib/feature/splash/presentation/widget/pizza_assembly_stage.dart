@@ -30,7 +30,7 @@ class PizzaAssemblyStage extends StatelessWidget {
     final peekOffset = width * (40 / 375);
     final showAssembly = t < SplashIntroAnimation.pizzaFadeEnd;
     final wipeDiameter = width * anim.wipeDiameterFactor(t);
-    final heroSize = width * anim.heroSizeFactor(t, heroWidthFactor);
+    final heroRestSize = width * heroWidthFactor;
 
     return SizedBox(
       height: width * 0.85,
@@ -69,7 +69,7 @@ class PizzaAssemblyStage extends StatelessWidget {
                 child: Transform.scale(
                   scale: 0.9 + 0.1 * peekIn.value,
                   child: Image.asset(
-                    AppImages.productPizzas[1],
+                    AppImages.productPizzas[0],
                     width: peekSize,
                     height: peekSize,
                     fit: BoxFit.contain,
@@ -94,12 +94,15 @@ class PizzaAssemblyStage extends StatelessWidget {
             ),
             Opacity(
               opacity: peekIn.value,
-              child: Hero(
-                tag: ProductConstants.pizzaHeroTag,
-                child: SizedBox(
-                  width: heroSize,
-                  height: heroSize,
-                  child: Image.asset(AppImages.productPizzas.first, fit: BoxFit.contain),
+              child: Transform.scale(
+                scale: anim.heroScale(t),
+                child: Hero(
+                  tag: ProductConstants.pizzaHeroTag,
+                  child: SizedBox(
+                    width: heroRestSize,
+                    height: heroRestSize,
+                    child: Image.asset(AppImages.productPizzas[1], fit: BoxFit.contain),
+                  ),
                 ),
               ),
             ),
