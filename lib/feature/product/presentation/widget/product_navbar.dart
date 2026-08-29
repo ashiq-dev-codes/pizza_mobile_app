@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
+import 'package:pizza_mobile_app/shared/widget/button/round_icon_button.dart';
+
+class ProductNavbar extends StatelessWidget {
+  const ProductNavbar({
+    super.key,
+    required this.isFavorite,
+    required this.onBack,
+    required this.onFavorite,
+  });
+
+  final bool isFavorite;
+  final VoidCallback onBack;
+  final VoidCallback onFavorite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 4),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              RoundIconButton(icon: LucideIcons.chevronLeft, onTap: onBack),
+              RoundIconButton(
+                icon: LucideIcons.heart,
+                iconColor: isFavorite ? AppColors.primary : AppColors.black,
+                onTap: onFavorite,
+              ),
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Pizzas',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.black.withValues(alpha: 0.7),
+                ),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Pepperoni Blast',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
+                  letterSpacing: -0.48,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
