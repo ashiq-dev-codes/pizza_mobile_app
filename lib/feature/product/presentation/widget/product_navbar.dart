@@ -7,12 +7,10 @@ class ProductNavbar extends StatelessWidget {
   const ProductNavbar({
     super.key,
     required this.isFavorite,
-    required this.onBack,
     required this.onFavorite,
   });
 
   final bool isFavorite;
-  final VoidCallback onBack;
   final VoidCallback onFavorite;
 
   @override
@@ -22,16 +20,13 @@ class ProductNavbar extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RoundIconButton(icon: LucideIcons.chevronLeft, onTap: onBack),
-              RoundIconButton(
-                icon: LucideIcons.heart,
-                iconColor: isFavorite ? AppColors.primary : AppColors.black,
-                onTap: onFavorite,
-              ),
-            ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: RoundIconButton(
+              icon: LucideIcons.heart,
+              iconColor: isFavorite ? AppColors.primary : AppColors.black,
+              onTap: onFavorite,
+            ),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,

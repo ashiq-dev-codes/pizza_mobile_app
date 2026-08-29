@@ -44,7 +44,6 @@ class _ProductScreenState extends State<ProductScreen> {
           children: [
             ProductNavbar(
               isFavorite: _isFavorite,
-              onBack: () => Navigator.of(context).maybePop(),
               onFavorite: () => setState(() => _isFavorite = !_isFavorite),
             ),
             Expanded(

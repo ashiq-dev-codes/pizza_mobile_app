@@ -19,20 +19,13 @@ class SplashNavbar extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SlideFade.x(
-                animation: animation,
-                from: -64,
-                child: const RoundIconButton(icon: LucideIcons.chevronLeft),
-              ),
-              SlideFade.x(
-                animation: animation,
-                from: 64,
-                child: const RoundIconButton(icon: LucideIcons.heart),
-              ),
-            ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: SlideFade.x(
+              animation: animation,
+              from: 64,
+              child: const RoundIconButton(icon: LucideIcons.heart),
+            ),
           ),
           SlideFade.y(
             animation: animation,
