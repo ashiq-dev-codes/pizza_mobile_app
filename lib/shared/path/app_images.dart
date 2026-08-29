@@ -1,6 +1,9 @@
 class AppImages {
   static const String _splashBasePath = 'assets/images/splash';
   static const String _productBasePath = 'assets/images/product';
+  static const String _globalBasePath = 'assets/images/global';
+
+  static const String bananaScale = '$_globalBasePath/banana.png';
 
   static const List<String> productPizzas = [
     '$_productBasePath/pizza_1.png',

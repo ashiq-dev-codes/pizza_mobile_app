@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:pizza_mobile_app/feature/product/presentation/page/product_page.dart';
 import 'package:pizza_mobile_app/shared/path/app_images.dart';
@@ -13,31 +11,35 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  static const _frameInterval = Duration(milliseconds: 220);
-  static const _holdOnComplete = Duration(milliseconds: 500);
-  static const _backgroundFadeDuration = Duration(milliseconds: 450);
+    with TickerProviderStateMixin {
+  static const _assemblyDuration = Duration(milliseconds: 700);
+  static const _holdOnComplete = Duration(milliseconds: 80);
+  static const _backgroundFadeDuration = Duration(milliseconds: 180);
 
+  final int _stepCount = AppImages.splashFrames.length - 1;
+
+  late final AnimationController _assemblyController;
   late final AnimationController _bgController;
-  late final Animation<Color?> _bgColor;
+  late final Animation<Color?> _bgColor = ColorTween(
+    begin: AppColors.white,
+    end: AppColors.background,
+  ).animate(CurvedAnimation(parent: _bgController, curve: Curves.easeInOut));
 
-  int _frameIndex = 0;
-  Timer? _frameTimer;
   bool _precached = false;
 
   @override
   void initState() {
     super.initState();
+    _assemblyController = AnimationController(
+      vsync: this,
+      duration: _assemblyDuration,
+    );
     _bgController = AnimationController(
       vsync: this,
       duration: _backgroundFadeDuration,
     );
-    _bgColor = ColorTween(
-      begin: AppColors.white,
-      end: AppColors.background,
-    ).animate(CurvedAnimation(parent: _bgController, curve: Curves.easeInOut));
 
-    _startAssembly();
+    _runSequence();
   }
 
   @override
@@ -51,22 +53,10 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  void _startAssembly() {
-    _frameTimer = Timer.periodic(_frameInterval, (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      if (_frameIndex >= AppImages.splashFrames.length - 1) {
-        timer.cancel();
-        _finishAssembly();
-        return;
-      }
-      setState(() => _frameIndex++);
-    });
-  }
+  Future<void> _runSequence() async {
+    await _assemblyController.forward();
+    if (!mounted) return;
 
-  Future<void> _finishAssembly() async {
     await Future.delayed(_holdOnComplete);
     if (!mounted) return;
 
@@ -75,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 400),
+        transitionDuration: const Duration(milliseconds: 220),
         pageBuilder: (_, _, _) => const ProductScreen(),
         transitionsBuilder: (_, animation, _, child) =>
             FadeTransition(opacity: animation, child: child),
@@ -85,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _frameTimer?.cancel();
+    _assemblyController.dispose();
     _bgController.dispose();
     super.dispose();
   }
@@ -95,21 +85,39 @@ class _SplashScreenState extends State<SplashScreen>
     final pizzaSize = MediaQuery.sizeOf(context).width * 0.72;
 
     return AnimatedBuilder(
-      animation: _bgColor,
+      animation: Listenable.merge([_assemblyController, _bgColor]),
       builder: (context, child) {
+        // Frames are cumulative (each has one more slice than the last), so a
+        // smooth dissolve only needs the next frame to fade in on top of a
+        // fully opaque current frame — fading the current one out too would
+        // wash out the slices they share in common, reading as a flicker.
+        final progress = _assemblyController.value * _stepCount;
+        final baseIndex = progress.floor().clamp(0, _stepCount - 1);
+        final sliceT = Curves.easeOut.transform(
+          (progress - baseIndex).clamp(0.0, 1.0),
+        );
+
         return Scaffold(
           backgroundColor: _bgColor.value,
           body: Center(
-            child: AnimatedSwitcher(
-              duration: _frameInterval,
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              child: Image.asset(
-                AppImages.splashFrames[_frameIndex],
-                key: ValueKey(_frameIndex),
-                width: pizzaSize,
-                height: pizzaSize,
-                fit: BoxFit.contain,
+            child: SizedBox(
+              width: pizzaSize,
+              height: pizzaSize,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    AppImages.splashFrames[baseIndex],
+                    fit: BoxFit.contain,
+                  ),
+                  Opacity(
+                    opacity: sliceT,
+                    child: Image.asset(
+                      AppImages.splashFrames[baseIndex + 1],
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
