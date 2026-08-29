@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_size.dart';
-import 'package:pizza_mobile_app/feature/splash/presentation/widget/slide_fade.dart';
+import 'package:pizza_mobile_app/feature/splash/presentation/widget/scale_fade.dart';
 import 'package:pizza_mobile_app/shared/path/app_images.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/arc_text/arc_text.dart';
@@ -23,13 +23,13 @@ class SizeRevealArea extends StatelessWidget {
         children: [
           Positioned(
             bottom: 0,
-            child: SlideFade.y(animation: animation, from: 40, child: _staticSizeRow()),
+            child: ScaleFade(animation: animation, from: 0.82, child: _staticSizeRow()),
           ),
           Positioned(
             bottom: 32,
-            child: SlideFade.y(
+            child: ScaleFade(
               animation: animation,
-              from: 40,
+              from: 0.82,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

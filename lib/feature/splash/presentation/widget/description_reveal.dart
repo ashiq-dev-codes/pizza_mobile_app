@@ -12,7 +12,7 @@ class DescriptionReveal extends StatelessWidget {
   Widget build(BuildContext context) {
     return SlideFade.y(
       animation: animation,
-      from: 40,
+      from: 20,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Text(

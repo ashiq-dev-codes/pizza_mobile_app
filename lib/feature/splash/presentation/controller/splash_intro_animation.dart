@@ -21,14 +21,19 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 class SplashIntroAnimation {
   SplashIntroAnimation({required TickerProvider vsync})
     : controller = AnimationController(vsync: vsync, duration: _totalDuration) {
-    navbarIn = _interval(0.62, 0.80);
     peekIn = _interval(heroStart, heroEnd);
-    bananaSizeIn = _interval(0.68, 0.88);
-    descriptionIn = _interval(0.74, 0.92);
-    orderRowIn = _interval(0.80, 1.0);
+    // Hand-off cascade: the hero pizza pops in first, then the rest of the
+    // product chrome follows behind it — header first, with a 50ms stagger,
+    // then the size selector and description, with the order row settling
+    // last (all clear of the 900ms mark, so nothing pops on the swap).
+    navbarIn = _reveal(afterHeroMs: 50, durationMs: 180);
+    bananaSizeIn = _reveal(afterHeroMs: 100, durationMs: 180);
+    descriptionIn = _reveal(afterHeroMs: 150, durationMs: 170);
+    orderRowIn = _reveal(afterHeroMs: 180, durationMs: 140);
   }
 
   static const _totalDuration = Duration(milliseconds: 900);
+  static const double _totalMs = 900;
 
   // Named breakpoints, as fractions of the total timeline.
   static const assemblyEnd = 0.42;
@@ -55,6 +60,15 @@ class SplashIntroAnimation {
     parent: controller,
     curve: Interval(start, end, curve: Curves.easeOutCubic),
   );
+
+  /// A reveal-phase interval timed relative to the hero image's own entrance
+  /// ([heroStart]), so each element's delay and duration can be specified in
+  /// milliseconds rather than as raw fractions of the total timeline.
+  Animation<double> _reveal({required double afterHeroMs, required double durationMs}) {
+    final start = heroStart + afterHeroMs / _totalMs;
+    final end = start + durationMs / _totalMs;
+    return _interval(start, end);
+  }
 
   Future<void> forward() => controller.forward();
 

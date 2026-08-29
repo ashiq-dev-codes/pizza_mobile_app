@@ -66,11 +66,14 @@ class PizzaAssemblyStage extends StatelessWidget {
               left: -peekOffset,
               child: Opacity(
                 opacity: peekIn.value,
-                child: Image.asset(
-                  AppImages.productPizzas[1],
-                  width: peekSize,
-                  height: peekSize,
-                  fit: BoxFit.contain,
+                child: Transform.scale(
+                  scale: 0.9 + 0.1 * peekIn.value,
+                  child: Image.asset(
+                    AppImages.productPizzas[1],
+                    width: peekSize,
+                    height: peekSize,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
@@ -78,11 +81,14 @@ class PizzaAssemblyStage extends StatelessWidget {
               right: -peekOffset,
               child: Opacity(
                 opacity: peekIn.value,
-                child: Image.asset(
-                  AppImages.productPizzas[2],
-                  width: peekSize,
-                  height: peekSize,
-                  fit: BoxFit.contain,
+                child: Transform.scale(
+                  scale: 0.9 + 0.1 * peekIn.value,
+                  child: Image.asset(
+                    AppImages.productPizzas[2],
+                    width: peekSize,
+                    height: peekSize,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
