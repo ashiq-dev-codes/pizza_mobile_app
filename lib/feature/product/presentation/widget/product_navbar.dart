@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/button/round_icon_button.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
 
+/// The product page's top bar: a back button and favorite button converge
+/// in from opposite screen edges while the title drops in from above —
+/// matching the source design's entrance, where each of the three pieces
+/// starts off-canvas on its own side and springs into the resting row
+/// together rather than the row appearing as one block.
 class ProductNavbar extends StatelessWidget {
   const ProductNavbar({
     super.key,
     required this.isFavorite,
     required this.onFavorite,
+    required this.backIn,
+    required this.titleIn,
+    required this.favIn,
   });
 
   final bool isFavorite;
   final VoidCallback onFavorite;
+  final Animation<double> backIn;
+  final Animation<double> titleIn;
+  final Animation<double> favIn;
 
   @override
   Widget build(BuildContext context) {
@@ -21,34 +33,56 @@ class ProductNavbar extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Align(
-            alignment: Alignment.centerRight,
-            child: RoundIconButton(
-              icon: LucideIcons.heart,
-              iconColor: isFavorite ? AppColors.primary : AppColors.black,
-              onTap: onFavorite,
+            alignment: Alignment.centerLeft,
+            child: SlideFade.x(
+              animation: backIn,
+              from: -80,
+              child: RoundIconButton(
+                icon: LucideIcons.arrowLeft,
+                iconColor: AppColors.black,
+                onTap: () {
+                  if (Navigator.canPop(context)) Navigator.pop(context);
+                },
+              ),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Pizzas',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: AppColors.black.withValues(alpha: 0.7),
-                ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: SlideFade.x(
+              animation: favIn,
+              from: 80,
+              child: RoundIconButton(
+                icon: LucideIcons.heart,
+                iconColor: isFavorite ? AppColors.primary : AppColors.black,
+                onTap: onFavorite,
               ),
-              const SizedBox(height: 2),
-              const Text(
-                'Pepperoni Blast',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                  letterSpacing: -0.48,
+            ),
+          ),
+          SlideFade.y(
+            animation: titleIn,
+            from: -130,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Pizzas',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.black.withValues(alpha: 0.7),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                const Text(
+                  'Pepperoni Blast',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                    letterSpacing: -0.48,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

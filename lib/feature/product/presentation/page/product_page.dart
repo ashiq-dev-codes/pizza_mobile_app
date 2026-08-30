@@ -69,14 +69,12 @@ class _ProductScreenState extends State<ProductScreen>
           SafeArea(
             child: Column(
               children: [
-                SlideFade.y(
-                  animation: _anim.navbarIn,
-                  from: -24,
-                  child: ProductNavbar(
-                    isFavorite: _isFavorite,
-                    onFavorite: () =>
-                        setState(() => _isFavorite = !_isFavorite),
-                  ),
+                ProductNavbar(
+                  isFavorite: _isFavorite,
+                  onFavorite: () => setState(() => _isFavorite = !_isFavorite),
+                  backIn: _anim.backIn,
+                  titleIn: _anim.titleIn,
+                  favIn: _anim.favIn,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -84,16 +82,16 @@ class _ProductScreenState extends State<ProductScreen>
                       children: [
                         ScaleFade(
                           animation: _anim.heroIn,
-                          from: 0.85,
+                          from: 40 / 244,
                           child: PizzaStage(
                             width: width,
                             selectedSize: _selectedSize,
                             onTapZoom: _openZoom,
                           ),
                         ),
-                        ScaleFade(
+                        SlideFade.y(
                           animation: _anim.sizeAreaIn,
-                          from: 0.82,
+                          from: 370,
                           child: SizeArea(
                             selectedSize: _selectedSize,
                             onSelect: (size) =>
@@ -103,7 +101,7 @@ class _ProductScreenState extends State<ProductScreen>
                         const SizedBox(height: 20),
                         SlideFade.y(
                           animation: _anim.descriptionIn,
-                          from: 20,
+                          from: 250,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Text(
@@ -119,7 +117,7 @@ class _ProductScreenState extends State<ProductScreen>
                         const SizedBox(height: 20),
                         SlideFade.y(
                           animation: _anim.orderRowIn,
-                          from: 40,
+                          from: 140,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: Row(
