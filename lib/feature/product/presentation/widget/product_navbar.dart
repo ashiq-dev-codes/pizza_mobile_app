@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/button/round_icon_button.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/slide_cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
 
 /// The product page's top bar: a back button and favorite button converge
@@ -21,11 +22,18 @@ class ProductNavbar extends StatelessWidget {
     required this.isFavorite,
     required this.onFavorite,
     required this.revealIn,
+    required this.title,
+    required this.titleDirection,
   });
 
   final bool isFavorite;
   final VoidCallback onFavorite;
   final Animation<double> revealIn;
+
+  /// The active pizza's name — swapping this crossfades/slides the title in
+  /// [titleDirection], staying in lockstep with the pizza carousel.
+  final String title;
+  final int titleDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -74,13 +82,17 @@ class ProductNavbar extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  'Pepperoni Blast',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                    letterSpacing: -0.48,
+                SlideCrossFade(
+                  value: title,
+                  direction: titleDirection,
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                      letterSpacing: -0.48,
+                    ),
                   ),
                 ),
               ],

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_mobile_app/feature/product/constant/product_constants.dart';
-import 'package:pizza_mobile_app/shared/path/app_images.dart';
 
 class ZoomedPizzaView extends StatelessWidget {
-  const ZoomedPizzaView({super.key});
+  const ZoomedPizzaView({super.key, required this.image});
+
+  final String image;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +16,7 @@ class ZoomedPizzaView extends StatelessWidget {
           child: Hero(
             tag: ProductConstants.pizzaHeroTag,
             child: Image.asset(
-              AppImages.productPizzas[1],
+              image,
               width: MediaQuery.sizeOf(context).width,
               fit: BoxFit.contain,
             ),

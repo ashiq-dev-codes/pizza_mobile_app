@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_mobile_app/feature/product/constant/pizza_catalog.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_size.dart';
-import 'package:pizza_mobile_app/feature/product/constant/product_constants.dart';
+import 'package:pizza_mobile_app/feature/product/presentation/controller/pizza_switch_animation.dart';
 import 'package:pizza_mobile_app/feature/product/presentation/controller/product_intro_animation.dart';
 import 'package:pizza_mobile_app/feature/product/presentation/widget/add_button.dart';
 import 'package:pizza_mobile_app/feature/product/presentation/widget/pizza_stage.dart';
@@ -11,6 +12,7 @@ import 'package:pizza_mobile_app/feature/product/presentation/widget/size_area.d
 import 'package:pizza_mobile_app/feature/product/presentation/widget/zoomed_pizza_view.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/scale_fade.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/slide_cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -21,14 +23,19 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final _anim = ProductIntroAnimation(vsync: this);
+  late final _switchAnim = PizzaSwitchAnimation(
+    vsync: this,
+    initialIndex: PizzaCatalog.defaultIndex,
+  );
 
   PizzaSize _selectedSize = PizzaSize.medium;
   int _quantity = 1;
   bool _isFavorite = false;
 
   double get _price => _selectedSize.price;
+  PizzaProduct get _activePizza => PizzaCatalog.all[_switchAnim.toIndex];
 
   @override
   void initState() {
@@ -39,15 +46,19 @@ class _ProductScreenState extends State<ProductScreen>
   @override
   void dispose() {
     _anim.dispose();
+    _switchAnim.dispose();
     super.dispose();
   }
 
+  void _switchPizza(int index) => setState(() => _switchAnim.switchTo(index));
+
   void _openZoom() {
+    final image = _activePizza.image;
     Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
         barrierColor: Colors.black.withValues(alpha: 0.9),
-        pageBuilder: (_, _, _) => const ZoomedPizzaView(),
+        pageBuilder: (_, _, _) => ZoomedPizzaView(image: image),
       ),
     );
   }
@@ -73,6 +84,8 @@ class _ProductScreenState extends State<ProductScreen>
                   isFavorite: _isFavorite,
                   onFavorite: () => setState(() => _isFavorite = !_isFavorite),
                   revealIn: _anim.revealIn,
+                  title: _activePizza.name,
+                  titleDirection: _switchAnim.direction,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -84,6 +97,10 @@ class _ProductScreenState extends State<ProductScreen>
                           child: PizzaStage(
                             width: width,
                             selectedSize: _selectedSize,
+                            fromIndex: _switchAnim.fromIndex,
+                            toIndex: _switchAnim.toIndex,
+                            progress: _switchAnim.progress,
+                            onSelectIndex: _switchPizza,
                             onTapZoom: _openZoom,
                           ),
                         ),
@@ -102,12 +119,16 @@ class _ProductScreenState extends State<ProductScreen>
                           from: 250,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Text(
-                              ProductConstants.description,
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.7,
-                                color: AppColors.black,
+                            child: SlideCrossFade(
+                              value: _activePizza.description,
+                              direction: _switchAnim.direction,
+                              child: Text(
+                                _activePizza.description,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  height: 1.7,
+                                  color: AppColors.black,
+                                ),
                               ),
                             ),
                           ),
