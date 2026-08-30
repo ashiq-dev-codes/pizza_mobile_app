@@ -69,17 +69,38 @@ class PizzaStage extends AnimatedWidget {
         clipBehavior: Clip.none,
         children: [
           for (final i in paintOrder)
-            _stageItem(i, focus, pizzaSize, peekSize, spacing, centerX, centerY, switching),
+            _stageItem(
+              i,
+              focus,
+              pizzaSize,
+              peekSize,
+              spacing,
+              centerX,
+              centerY,
+              switching,
+            ),
           Positioned(
             left: centerX - width * (24 / 375),
             top: centerY - width * (24 / 375),
             child: GestureDetector(
               onTap: onTapZoom,
-              child: Icon(
-                LucideIcons.search,
-                size: width * (48 / 375),
-                color: AppColors.white,
-                shadows: const [Shadow(color: Colors.black38, blurRadius: 6)],
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 48,
+                      spreadRadius: 0,
+                      offset: Offset(0, 0),
+                      color: AppColors.black.withValues(alpha: 0.2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  LucideIcons.search,
+                  size: width * (48 / 375),
+                  color: AppColors.white,
+                  shadows: const [Shadow(color: Colors.black38, blurRadius: 6)],
+                ),
               ),
             ),
           ),
