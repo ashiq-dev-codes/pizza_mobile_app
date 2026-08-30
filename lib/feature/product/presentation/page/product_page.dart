@@ -11,8 +11,8 @@ import 'package:pizza_mobile_app/feature/product/presentation/widget/quantity_st
 import 'package:pizza_mobile_app/feature/product/presentation/widget/size_area.dart';
 import 'package:pizza_mobile_app/feature/product/presentation/widget/zoomed_pizza_view.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/scale_fade.dart';
-import 'package:pizza_mobile_app/shared/widget/reveal/slide_cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -85,7 +85,6 @@ class _ProductScreenState extends State<ProductScreen>
                   onFavorite: () => setState(() => _isFavorite = !_isFavorite),
                   revealIn: _anim.revealIn,
                   title: _activePizza.name,
-                  titleDirection: _switchAnim.direction,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -119,9 +118,8 @@ class _ProductScreenState extends State<ProductScreen>
                           from: 250,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: SlideCrossFade(
+                            child: CrossFade(
                               value: _activePizza.description,
-                              direction: _switchAnim.direction,
                               child: Text(
                                 _activePizza.description,
                                 style: const TextStyle(
