@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/spring_curve.dart';
 
 /// Drives the product page's pizza-carousel swap: tapping a peeking pizza
 /// pulls it to center while the current center slides out to the opposite
 /// peek slot. [progress] is the per-frame value the carousel reads to place
 /// each pizza; the title and description key off [toIndex] alone, since
 /// they crossfade in place rather than sliding with the pizza.
+///
+/// Uses the same [SpringCurve.elastic] as the page's own intro reveal, so
+/// the pizza overshoots its resting spot and recoils back — a fast, bouncy
+/// snap rather than a plain ease-out — matching the source Figma prototype.
 class PizzaSwitchAnimation {
   PizzaSwitchAnimation({required TickerProvider vsync, required int initialIndex})
     : controller = AnimationController(vsync: vsync, duration: _duration),
@@ -17,7 +22,7 @@ class PizzaSwitchAnimation {
 
   late final Animation<double> progress = CurvedAnimation(
     parent: controller,
-    curve: Curves.easeOutCubic,
+    curve: SpringCurve.elastic(settleDuration: _duration),
   );
 
   /// The carousel index being left, and the one being entered — both held

@@ -38,7 +38,11 @@ class PizzaStage extends AnimatedWidget {
   Widget build(BuildContext context) {
     final t = _progress.value;
     final focus = fromIndex + (toIndex - fromIndex) * t;
-    final switching = t > 0.0 && t < 1.0;
+    // True for the whole spring, overshoot and recoil included — not just
+    // while the raw value sits between 0 and 1 — so the center pizza's own
+    // resize (below) doesn't fight the spring with its own separate tween
+    // once the curve first crosses 1.0 mid-bounce.
+    final switching = _progress.status == AnimationStatus.forward;
 
     final stageHeight = width * 0.85;
     final pizzaSize = width * selectedSize.widthFactor;
