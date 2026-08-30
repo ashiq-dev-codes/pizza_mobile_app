@@ -1,8 +1,8 @@
 class ProductConstants {
   const ProductConstants._();
 
-  // Must match across the splash and product screens so the Hero handoff
-  // between them is a seamless continuation.
+  // Shared between the product page and its zoomed-in view so the Hero
+  // handoff between them is a seamless continuation.
   static const String pizzaHeroTag = 'pizza-image';
 
   static const String description =

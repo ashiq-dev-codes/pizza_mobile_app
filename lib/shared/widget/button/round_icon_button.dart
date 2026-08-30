@@ -3,8 +3,7 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 
 /// A circular, elevated icon button used for navbar actions across
 /// features. Passing a null [onTap] renders a static button with no tap
-/// feedback — used by the splash screen's preview navbar, which only
-/// mirrors the product page's look while the intro plays.
+/// feedback.
 class RoundIconButton extends StatelessWidget {
   const RoundIconButton({super.key, required this.icon, this.onTap, this.iconColor});
 

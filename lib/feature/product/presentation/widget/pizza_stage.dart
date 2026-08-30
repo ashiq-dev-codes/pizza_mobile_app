@@ -29,14 +29,6 @@ class PizzaStage extends StatelessWidget {
         alignment: Alignment.center,
         clipBehavior: Clip.none,
         children: [
-          Container(
-            width: width * 1.5,
-            height: width * 1.5,
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              shape: BoxShape.circle,
-            ),
-          ),
           Positioned(
             left: -peekOffset,
             child: Image.asset(

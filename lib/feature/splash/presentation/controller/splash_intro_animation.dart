@@ -10,67 +10,30 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 ///    screen (the `splash_N` cumulative frames).
 /// 2. Once whole, it fades out while the background tints from white to the
 ///    product page's peach.
-/// 3. A white circle grows in from below the screen and sweeps upward,
-///    covering the peach everywhere except the small halo behind where the
-///    hero pizza will sit.
-/// 4. The navbar, hero pizza, banana/size row, description, and order row
-///    fade/slide into their resting positions.
 ///
-/// The whole thing runs in under a second in the source prototype, then
-/// hands off to the product page with no visible seam.
+/// That's the whole splash — it hands off to [ProductScreen] the instant the
+/// tint finishes, at a solid peach screen. [ProductScreen] owns everything
+/// that happens after that (see `ProductIntroAnimation`).
 class SplashIntroAnimation {
   SplashIntroAnimation({required TickerProvider vsync})
-    : controller = AnimationController(vsync: vsync, duration: _totalDuration) {
-    peekIn = _interval(heroStart, heroEnd);
-    // Hand-off cascade: the hero pizza pops in first, then the rest of the
-    // product chrome follows behind it — header first, with a 50ms stagger,
-    // then the size selector and description, with the order row settling
-    // last. Each element keeps a full ~170-180ms glide (rather than being
-    // compressed to fit), and all of them clear their rest state well
-    // before the 900ms mark so nothing pops on the swap to the product page.
-    navbarIn = _reveal(afterHeroMs: 50, durationMs: 170);
-    bananaSizeIn = _reveal(afterHeroMs: 90, durationMs: 180);
-    descriptionIn = _reveal(afterHeroMs: 130, durationMs: 175);
-    orderRowIn = _reveal(afterHeroMs: 150, durationMs: 165);
-  }
+    : controller = AnimationController(vsync: vsync, duration: _totalDuration);
 
-  static const _totalDuration = Duration(milliseconds: 900);
-  static const double _totalMs = 900;
+  // Same absolute millisecond timings as the original single 900ms timeline
+  // (assembly ends ~378ms, bg starts tinting ~360ms, finishes ~520ms) — only
+  // rescaled onto a shorter total now that the wipe/reveal tail has moved to
+  // ProductScreen.
+  static const _totalDuration = Duration(milliseconds: 520);
 
   // Named breakpoints, as fractions of the total timeline.
-  static const assemblyEnd = 0.42;
-  static const _bgFadeStart = 0.40;
-  static const _bgFadeEnd = 0.58;
-  static const pizzaFadeStart = 0.44;
-  static const pizzaFadeEnd = 0.58;
-  static const _wipeStart = 0.56;
-  static const _wipeEnd = 0.70;
-  static const heroStart = 0.62;
-  static const heroEnd = 0.82;
+  static const assemblyEnd = 0.727;
+  static const _bgFadeStart = 0.692;
+  static const _bgFadeEnd = 1.0;
+  static const pizzaFadeStart = 0.762;
+  static const pizzaFadeEnd = 1.0;
 
   static final int stepCount = AppImages.splashFrames.length - 1;
 
   final AnimationController controller;
-
-  late final Animation<double> navbarIn;
-  late final Animation<double> peekIn;
-  late final Animation<double> bananaSizeIn;
-  late final Animation<double> descriptionIn;
-  late final Animation<double> orderRowIn;
-
-  Animation<double> _interval(double start, double end) => CurvedAnimation(
-    parent: controller,
-    curve: Interval(start, end, curve: Curves.easeOutCubic),
-  );
-
-  /// A reveal-phase interval timed relative to the hero image's own entrance
-  /// ([heroStart]), so each element's delay and duration can be specified in
-  /// milliseconds rather than as raw fractions of the total timeline.
-  Animation<double> _reveal({required double afterHeroMs, required double durationMs}) {
-    final start = heroStart + afterHeroMs / _totalMs;
-    final end = start + durationMs / _totalMs;
-    return _interval(start, end);
-  }
 
   Future<void> forward() => controller.forward();
 
@@ -98,22 +61,4 @@ class SplashIntroAnimation {
   }
 
   Color bgColor(double t) => Color.lerp(AppColors.white, AppColors.background, bgBlend(t))!;
-
-  /// The white wipe's diameter, as a multiple of screen width: 0 until the
-  /// halo has faded in, then grows enough to sweep past the whole screen.
-  double wipeDiameterFactor(double t) {
-    if (t < _wipeStart) return 0;
-    final localT = ((t - _wipeStart) / (_wipeEnd - _wipeStart)).clamp(0.0, 1.0);
-    return Curves.easeInOut.transform(localT) * 4.2;
-  }
-
-  /// Hero pizza's pop-in scale (0→1), once the wipe has mostly covered the
-  /// screen. Meant to drive a `Transform.scale` on a fixed-size child rather
-  /// than the child's actual width/height, so the pop is a cheap paint-time
-  /// transform instead of a per-frame relayout — and shares the same ease as
-  /// the rest of the reveal cascade so nothing reads as the odd one out.
-  double heroScale(double t) {
-    final localT = ((t - heroStart) / (heroEnd - heroStart)).clamp(0.0, 1.0);
-    return Curves.easeOutCubic.transform(localT);
-  }
 }

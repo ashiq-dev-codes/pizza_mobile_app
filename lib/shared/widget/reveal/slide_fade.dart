@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 /// Fades and slides [child] into place as [animation] advances from 0 to 1,
-/// sliding in from [from] pixels along the given axis. Used throughout the
-/// splash intro so each element's entrance reads as a "reveal" rather than
-/// an abrupt appearance.
+/// sliding in from [from] pixels along the given axis. Used for entrance
+/// cascades (e.g. the product page's intro) so each element's arrival reads
+/// as a "reveal" rather than an abrupt appearance.
 class SlideFade extends AnimatedWidget {
   const SlideFade.x({super.key, required Animation<double> animation, required double from, required this.child})
     : _dx = from,
