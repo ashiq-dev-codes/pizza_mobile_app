@@ -17,8 +17,8 @@ extension PizzaSizeX on PizzaSize {
   };
 
   double get price => switch (this) {
-    PizzaSize.small => 14.99,
+    PizzaSize.small => 15.99,
     PizzaSize.medium => 17.99,
-    PizzaSize.large => 20.99,
+    PizzaSize.large => 25.99,
   };
 }

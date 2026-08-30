@@ -6,6 +6,7 @@ import 'package:pizza_mobile_app/feature/product/constant/pizza_catalog.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_size.dart';
 import 'package:pizza_mobile_app/feature/product/constant/product_constants.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/spring_curve.dart';
 
 /// The hero pizza plus its two peeking neighbours. Tapping a peek pulls that
 /// pizza to center while the current center slides out to the opposite peek
@@ -31,6 +32,12 @@ class PizzaStage extends AnimatedWidget {
   final int toIndex;
   final ValueChanged<int> onSelectIndex;
   final VoidCallback onTapZoom;
+
+  /// How long the center pizza's own resize tween runs when only the size
+  /// (not the carousel focus) changes — kept equal to the curve's own
+  /// settle window so the elastic overshoot has room to read before the
+  /// tween hard-stops at 1.0.
+  static const _resizeDuration = Duration(milliseconds: 340);
 
   Animation<double> get _progress => listenable as Animation<double>;
 
@@ -131,8 +138,8 @@ class PizzaStage extends AnimatedWidget {
     final dx = slot * spacing;
 
     Widget image = AnimatedContainer(
-      duration: switching ? Duration.zero : const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
+      duration: switching ? Duration.zero : _resizeDuration,
+      curve: SpringCurve.elastic(settleDuration: _resizeDuration),
       width: size,
       height: size,
       child: Image.asset(PizzaCatalog.all[i].image, fit: BoxFit.contain),
@@ -147,17 +154,35 @@ class PizzaStage extends AnimatedWidget {
         ? () => onSelectIndex(i)
         : null;
 
+    // At rest on the center pizza, `size` tracks `selectedSize` directly and
+    // would otherwise snap the Positioned box straight to it on the very
+    // next frame — which then forces that exact size on the AnimatedContainer
+    // above via tight layout constraints, silently cancelling its own
+    // elastic tween before it can ever be seen. Sizing the box well past the
+    // largest the center pizza can ever be (only while at rest — mid-switch
+    // still needs the box to track `size` per frame, since that per-frame
+    // resize *is* the carousel spring) leaves the AnimatedContainer free to
+    // actually animate within it, centered by the wrapping [Center]. The 15%
+    // pad on top of Large — bigger than any target size, including Large
+    // itself — matters because the elastic curve overshoots ~8% past
+    // *whatever* it's tweening to, so growing into (or through) Large needs
+    // room beyond Large's own footprint or that overshoot gets clipped flat.
+    final atRestCenter = !switching && i == toIndex;
+    final boxExtent = atRestCenter
+        ? width * PizzaSize.large.widthFactor * 1.15
+        : size;
+
     return Positioned(
-      left: centerX + dx - size / 2,
-      top: centerY - size / 2,
-      width: size,
-      height: size,
+      left: centerX + dx - boxExtent / 2,
+      top: centerY - boxExtent / 2,
+      width: boxExtent,
+      height: boxExtent,
       child: Opacity(
         opacity: opacity,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          child: image,
+          child: atRestCenter ? Center(child: image) : image,
         ),
       ),
     );

@@ -14,11 +14,11 @@ class SizeSelectorRow extends StatelessWidget {
 
   static const _circleSize = 48.0;
 
-  /// How much lower the selected chip sits than its neighbours — the source
-  /// design pops the active size down and out of the row rather than just
-  /// recoloring it in place.
-  static const _selectedDrop = 20.0;
-  static const _slotHeight = _circleSize + _selectedDrop;
+  /// How much lower M sits than S and L — a fixed curve matching the
+  /// banana-arc theme, tied to *which size* a chip is rather than whether
+  /// it's currently selected, so the row's shape never moves on tap.
+  static const _midDrop = 20.0;
+  static const _rowHeight = _circleSize + _midDrop;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +29,9 @@ class SizeSelectorRow extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 33),
           child: SizedBox(
-            height: _slotHeight,
+            height: _rowHeight,
             child: Align(
-              alignment: selected
+              alignment: size == PizzaSize.medium
                   ? Alignment.bottomCenter
                   : Alignment.topCenter,
               child: GestureDetector(
