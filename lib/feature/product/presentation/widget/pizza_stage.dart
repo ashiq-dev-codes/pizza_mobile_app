@@ -42,8 +42,12 @@ class PizzaStage extends AnimatedWidget {
 
     final stageHeight = width * 0.85;
     final pizzaSize = width * selectedSize.widthFactor;
-    final peekSize = width * (80 / 375);
-    final spacing = pizzaSize / 2;
+    final peekSize = width * (85 / 375);
+    // The peeking neighbours sit with their own center right at the screen
+    // edge — so only about half of each is actually visible, sliced off by
+    // the device edge itself — matching the source Figma prototype, rather
+    // than floating fully on-screen next to the hero pizza.
+    final spacing = width / 2;
     final centerX = width / 2;
     final centerY = stageHeight / 2;
 
