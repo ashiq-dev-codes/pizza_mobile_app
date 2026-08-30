@@ -34,9 +34,9 @@ class PizzaStage extends AnimatedWidget {
   final VoidCallback onTapZoom;
 
   /// How long the center pizza's own resize tween runs when only the size
-  /// (not the carousel focus) changes — kept equal to the curve's own
-  /// settle window so the elastic overshoot has room to read before the
-  /// tween hard-stops at 1.0.
+  /// (not the carousel focus) changes — kept equal to [SpringCurve.elastic]'s
+  /// own settle window so its overshoot has room to read before the tween
+  /// hard-stops at the target.
   static const _resizeDuration = Duration(milliseconds: 340);
 
   Animation<double> get _progress => listenable as Animation<double>;
@@ -98,12 +98,12 @@ class PizzaStage extends AnimatedWidget {
                       blurRadius: 48,
                       spreadRadius: 0,
                       offset: Offset(0, 0),
-                      color: AppColors.black.withValues(alpha: 0.2),
+                      color: AppColors.black.withValues(alpha: 0.33),
                     ),
                   ],
                 ),
                 child: Icon(
-                  LucideIcons.search,
+                  LucideIcons.search200,
                   size: width * (48 / 375),
                   color: AppColors.white,
                   shadows: const [Shadow(color: Colors.black38, blurRadius: 6)],
@@ -137,6 +137,11 @@ class PizzaStage extends AnimatedWidget {
     final opacity = absSlot <= 1 ? 1.0 : 1 - overshoot;
     final dx = slot * spacing;
 
+    // At rest on the center pizza, `size` tracks `selectedSize` directly and
+    // gets room (below) for its tween to actually show; every other case
+    // (mid-switch, or a peek) just tracks `size` on the same curve.
+    final atRestCenter = !switching && i == toIndex;
+
     Widget image = AnimatedContainer(
       duration: switching ? Duration.zero : _resizeDuration,
       curve: SpringCurve.elastic(settleDuration: _resizeDuration),
@@ -154,22 +159,16 @@ class PizzaStage extends AnimatedWidget {
         ? () => onSelectIndex(i)
         : null;
 
-    // At rest on the center pizza, `size` tracks `selectedSize` directly and
-    // would otherwise snap the Positioned box straight to it on the very
-    // next frame — which then forces that exact size on the AnimatedContainer
-    // above via tight layout constraints, silently cancelling its own
-    // elastic tween before it can ever be seen. Sizing the box well past the
-    // largest the center pizza can ever be (only while at rest — mid-switch
-    // still needs the box to track `size` per frame, since that per-frame
-    // resize *is* the carousel spring) leaves the AnimatedContainer free to
-    // actually animate within it, centered by the wrapping [Center]. The 15%
-    // pad on top of Large — bigger than any target size, including Large
-    // itself — matters because the elastic curve overshoots ~8% past
-    // *whatever* it's tweening to, so growing into (or through) Large needs
-    // room beyond Large's own footprint or that overshoot gets clipped flat.
-    final atRestCenter = !switching && i == toIndex;
+    // The Positioned box would otherwise snap straight to `size` on the very
+    // next frame, forcing that exact size on the AnimatedContainer above via
+    // tight layout constraints and clipping its own tween flat before it can
+    // ever be seen. Sizing it a little past the largest the center pizza can
+    // ever be (only while at rest — mid-switch still needs the box to track
+    // `size` per frame, since that per-frame resize *is* the carousel
+    // spring) leaves just enough room for the curve's modest overshoot,
+    // centered by the wrapping [Center].
     final boxExtent = atRestCenter
-        ? width * PizzaSize.large.widthFactor * 1.15
+        ? width * PizzaSize.large.widthFactor * 1.1
         : size;
 
     return Positioned(

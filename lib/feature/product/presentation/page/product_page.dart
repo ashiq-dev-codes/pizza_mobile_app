@@ -132,37 +132,36 @@ class _ProductScreenState extends State<ProductScreen>
                           ),
                         ),
                         const SizedBox(height: 20),
-                        SlideFade.y(
-                          animation: _anim.springApartIn,
-                          from: 140,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                QuantityStepper(
-                                  quantity: _quantity,
-                                  onChanged: (q) =>
-                                      setState(() => _quantity = q),
-                                ),
-                                Text(
-                                  '\$${_price.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.black,
-                                  ),
-                                ),
-                                AddButton(onTap: () {}),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
                 ),
+                SlideFade.y(
+                  animation: _anim.springApartIn,
+                  from: 140,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        QuantityStepper(
+                          quantity: _quantity,
+                          onChanged: (q) => setState(() => _quantity = q),
+                        ),
+                        Text(
+                          '\$${_price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        AddButton(onTap: () {}),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
