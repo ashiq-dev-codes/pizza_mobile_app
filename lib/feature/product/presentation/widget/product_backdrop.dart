@@ -47,7 +47,7 @@ class ProductBackdrop extends AnimatedWidget {
       left: width / 2 - radius,
       top: centerY - radius,
       width: radius * 2,
-      height: radius * 2.5,
+      height: radius * 2.6,
       child: const DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.background,

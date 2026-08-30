@@ -6,7 +6,11 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/arc_text/arc_text.dart';
 
 class SizeArea extends StatelessWidget {
-  const SizeArea({super.key, required this.selectedSize, required this.onSelect});
+  const SizeArea({
+    super.key,
+    required this.selectedSize,
+    required this.onSelect,
+  });
 
   final PizzaSize selectedSize;
   final ValueChanged<PizzaSize> onSelect;
@@ -14,36 +18,41 @@ class SizeArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 108,
+      height: 128,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
+          // Painted first (underneath): the selected chip's white ring sits
+          // on top of the banana, clipping its silhouette — not the other
+          // way around — matching the source design.
           Positioned(
-            bottom: 0,
-            child: SizeSelectorRow(selectedSize: selectedSize, onSelect: onSelect),
+            bottom: 50,
+            child: ArcText(
+              text: 'Banana for scale',
+              radius: 58,
+              style: TextStyle(
+                fontSize: 9,
+                letterSpacing: 0.5,
+                fontStyle: FontStyle.italic,
+                color: AppColors.black.withValues(alpha: 0.55),
+              ),
+            ),
           ),
           Positioned(
-            bottom: 32,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ArcText(
-                  text: 'Banana for scale',
-                  radius: 58,
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.black.withValues(alpha: 0.55),
-                  ),
-                ),
-                Image.asset(
-                  AppImages.bananaScale,
-                  width: 90,
-                  height: 58,
-                  fit: BoxFit.contain,
-                ),
-              ],
+            bottom: 33,
+            child: Image.asset(
+              AppImages.bananaScale,
+              width: 90,
+              height: 58,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            child: SizeSelectorRow(
+              selectedSize: selectedSize,
+              onSelect: onSelect,
             ),
           ),
         ],
