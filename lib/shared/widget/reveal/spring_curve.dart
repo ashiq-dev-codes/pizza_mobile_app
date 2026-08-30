@@ -26,15 +26,16 @@ class SpringCurve extends Curve {
            settleDuration.inMicroseconds / Duration.microsecondsPerSecond;
 
   /// Rubber-band tension tuned for entrance reveals: high stiffness and a
-  /// light mass so the motion feels snappy, with damping just underdamped
-  /// enough to overshoot by ~3-4% (e.g. scaling past 1.0 to ~1.04) before
-  /// settling, rather than oscillating back and forth repeatedly. Stiffer
-  /// than a textbook "elastic" spring so it resolves within a quick
-  /// [settleDuration] instead of still visibly decaying when it gets
-  /// snapped to rest — a short window paired with a soft spring reads as a
-  /// jump-cut, not a settle.
-  factory SpringCurve.elastic({Duration settleDuration = const Duration(milliseconds: 280)}) =>
-      SpringCurve(mass: 0.7, stiffness: 300, damping: 21, settleDuration: settleDuration);
+  /// light mass so the motion feels snappy, with damping underdamped enough
+  /// to overshoot by ~8% (e.g. scaling past 1.0 to ~1.08, or a slide
+  /// continuing ~8% past its resting offset) before recoiling back —
+  /// enough to read as a genuine spring rather than a barely-there wobble.
+  /// [settleDuration] is deliberately given a little slack over this
+  /// spring's own ~320ms natural settle time, so it decays to a near-exact
+  /// rest before getting hard-snapped there — too little slack and that
+  /// snap lands mid-recoil, which reads as a stutter, not a settle.
+  factory SpringCurve.elastic({Duration settleDuration = const Duration(milliseconds: 340)}) =>
+      SpringCurve(mass: 0.7, stiffness: 280, damping: 17.5, settleDuration: settleDuration);
 
   final double mass;
   final double stiffness;

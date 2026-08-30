@@ -9,21 +9,23 @@ import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
 /// matching the source design's entrance, where each of the three pieces
 /// starts off-canvas on its own side and springs into the resting row
 /// together rather than the row appearing as one block.
+///
+/// All three share one [revealIn] animation (rather than each getting its
+/// own independently-timed one) so they read the exact same progress value
+/// every tick — they overshoot and settle in perfect lockstep, which is
+/// what makes the convergence read as one cohesive snap instead of three
+/// slightly-offset pops.
 class ProductNavbar extends StatelessWidget {
   const ProductNavbar({
     super.key,
     required this.isFavorite,
     required this.onFavorite,
-    required this.backIn,
-    required this.titleIn,
-    required this.favIn,
+    required this.revealIn,
   });
 
   final bool isFavorite;
   final VoidCallback onFavorite;
-  final Animation<double> backIn;
-  final Animation<double> titleIn;
-  final Animation<double> favIn;
+  final Animation<double> revealIn;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class ProductNavbar extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: SlideFade.x(
-              animation: backIn,
+              animation: revealIn,
               from: -80,
               child: RoundIconButton(
                 icon: LucideIcons.arrowLeft,
@@ -49,7 +51,7 @@ class ProductNavbar extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: SlideFade.x(
-              animation: favIn,
+              animation: revealIn,
               from: 80,
               child: RoundIconButton(
                 icon: LucideIcons.heart,
@@ -59,7 +61,7 @@ class ProductNavbar extends StatelessWidget {
             ),
           ),
           SlideFade.y(
-            animation: titleIn,
+            animation: revealIn,
             from: -130,
             child: Column(
               mainAxisSize: MainAxisSize.min,

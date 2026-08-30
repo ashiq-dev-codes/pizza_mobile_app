@@ -72,16 +72,14 @@ class _ProductScreenState extends State<ProductScreen>
                 ProductNavbar(
                   isFavorite: _isFavorite,
                   onFavorite: () => setState(() => _isFavorite = !_isFavorite),
-                  backIn: _anim.backIn,
-                  titleIn: _anim.titleIn,
-                  favIn: _anim.favIn,
+                  revealIn: _anim.revealIn,
                 ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
                         ScaleFade(
-                          animation: _anim.heroIn,
+                          animation: _anim.revealIn,
                           from: 40 / 244,
                           child: PizzaStage(
                             width: width,
@@ -90,7 +88,7 @@ class _ProductScreenState extends State<ProductScreen>
                           ),
                         ),
                         SlideFade.y(
-                          animation: _anim.sizeAreaIn,
+                          animation: _anim.springApartIn,
                           from: 370,
                           child: SizeArea(
                             selectedSize: _selectedSize,
@@ -100,7 +98,7 @@ class _ProductScreenState extends State<ProductScreen>
                         ),
                         const SizedBox(height: 20),
                         SlideFade.y(
-                          animation: _anim.descriptionIn,
+                          animation: _anim.springApartIn,
                           from: 250,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -116,7 +114,7 @@ class _ProductScreenState extends State<ProductScreen>
                         ),
                         const SizedBox(height: 20),
                         SlideFade.y(
-                          animation: _anim.orderRowIn,
+                          animation: _anim.springApartIn,
                           from: 140,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
