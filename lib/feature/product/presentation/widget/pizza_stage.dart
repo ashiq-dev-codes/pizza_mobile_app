@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_catalog.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_size.dart';
-import 'package:pizza_mobile_app/feature/product/constant/product_constants.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/spring_curve.dart';
 
@@ -24,6 +23,8 @@ class PizzaStage extends AnimatedWidget {
     required Animation<double> progress,
     required this.onSelectIndex,
     required this.onTapZoom,
+    this.centerPizzaKey,
+    this.hideCenterPizza = false,
   }) : super(listenable: progress);
 
   final double width;
@@ -32,6 +33,16 @@ class PizzaStage extends AnimatedWidget {
   final int toIndex;
   final ValueChanged<int> onSelectIndex;
   final VoidCallback onTapZoom;
+
+  /// Marks the center pizza's own image box so the page can measure its
+  /// exact on-screen rect at tap time — the zoom overlay grows from that
+  /// rect in place rather than flying to a different route.
+  final Key? centerPizzaKey;
+
+  /// True while the zoom overlay owns the visuals: hides the (now
+  /// pixel-for-pixel occluded) center pizza here so there's no chance of a
+  /// seam between the two during the brief moment they're the same size.
+  final bool hideCenterPizza;
 
   /// How long the center pizza's own resize tween runs when only the size
   /// (not the carousel focus) changes — kept equal to [SpringCurve.elastic]'s
@@ -142,16 +153,17 @@ class PizzaStage extends AnimatedWidget {
     // (mid-switch, or a peek) just tracks `size` on the same curve.
     final atRestCenter = !switching && i == toIndex;
 
-    Widget image = AnimatedContainer(
+    final image = AnimatedContainer(
+      key: i == toIndex ? centerPizzaKey : null,
       duration: switching ? Duration.zero : _resizeDuration,
       curve: SpringCurve.elastic(settleDuration: _resizeDuration),
       width: size,
       height: size,
-      child: Image.asset(PizzaCatalog.all[i].image, fit: BoxFit.contain),
+      child: Opacity(
+        opacity: (i == toIndex && hideCenterPizza) ? 0 : 1,
+        child: Image.asset(PizzaCatalog.all[i].image, fit: BoxFit.contain),
+      ),
     );
-    if (i == toIndex) {
-      image = Hero(tag: ProductConstants.pizzaHeroTag, child: image);
-    }
 
     final onTap = i == toIndex
         ? onTapZoom

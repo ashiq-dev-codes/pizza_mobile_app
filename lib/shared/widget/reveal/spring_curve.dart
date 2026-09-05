@@ -37,6 +37,17 @@ class SpringCurve extends Curve {
   factory SpringCurve.elastic({Duration settleDuration = const Duration(milliseconds: 340)}) =>
       SpringCurve(mass: 0.7, stiffness: 280, damping: 17.5, settleDuration: settleDuration);
 
+  /// Same ~8% overshoot and damping *ratio* as [elastic] — a clearly
+  /// readable bounce, not just a crisp settle — but retuned for a much
+  /// shorter natural response time — a sub-200ms in-place scale, say —
+  /// rather than [elastic]'s ~320ms. A spring's physical settle time comes
+  /// from its mass/stiffness/damping, not from [settleDuration]; reusing
+  /// [elastic]'s own tension at a much shorter [settleDuration] would sample
+  /// only the very first sliver of its motion and hard-snap the rest,
+  /// reading as an instant cut instead of a bounce.
+  factory SpringCurve.snappy({Duration settleDuration = const Duration(milliseconds: 180)}) =>
+      SpringCurve(mass: 1, stiffness: 1200, damping: 43, settleDuration: settleDuration);
+
   final double mass;
   final double stiffness;
   final double damping;
