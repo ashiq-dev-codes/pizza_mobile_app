@@ -17,6 +17,7 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/scale_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/suppressed_animation.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -35,6 +36,21 @@ class _ProductScreenState extends State<ProductScreen>
   late final _zoomAnim = PizzaZoomAnimation(vsync: this)
     ..controller.addStatusListener(_onZoomStatusChanged);
 
+  // The navbar and the bottom bundle (dial/description/stepper) already
+  // slide/fade in via _anim's own reveal — reusing those same animations
+  // (rather than separate ones) as the *base* here means their zoom-driven
+  // exit retraces the identical path in reverse, so opening zoom reads as
+  // "the entrance playing backwards to make room" instead of a distinct,
+  // separately-tuned motion. See [SuppressedAnimation].
+  late final _chromeVisibility = SuppressedAnimation(
+    base: _anim.revealIn,
+    suppressor: _zoomAnim.progress,
+  );
+  late final _bottomVisibility = SuppressedAnimation(
+    base: _anim.springApartIn,
+    suppressor: _zoomAnim.progress,
+  );
+
   final _stackKey = GlobalKey();
   final _pizzaKey = GlobalKey();
 
@@ -44,11 +60,14 @@ class _ProductScreenState extends State<ProductScreen>
 
   // The rect the center pizza occupies on screen the moment it's tapped —
   // the zoom overlay grows from exactly this rect in place, rather than
-  // flying to a different route, matching the source Figma prototype (the
-  // rest of the page never moves or fades; the pizza simply grows large
-  // enough to cover it). Cleared once the reverse animation fully settles,
-  // so the real stage pizza underneath is only ever revealed at a matching
-  // size — see [_onZoomStatusChanged].
+  // flying to a different route, matching the source Figma prototype. The
+  // rest of the page's chrome doesn't just sit there waiting to be covered
+  // up, either — see [_chromeVisibility]/[_bottomVisibility] — it slides
+  // and fades out of the way in lockstep with the growth, retracing its own
+  // entrance in reverse, matching the source rather than looking like a
+  // circle merely growing on top of a frozen page. Cleared once the reverse
+  // animation fully settles, so the real stage pizza underneath is only
+  // ever revealed at a matching size — see [_onZoomStatusChanged].
   Rect? _zoomRect;
 
   double get _price => _selectedSize.price;
@@ -146,12 +165,16 @@ class _ProductScreenState extends State<ProductScreen>
               SafeArea(
                 child: Column(
                   children: [
-                    ProductNavbar(
-                      isFavorite: _isFavorite,
-                      onFavorite: () =>
-                          setState(() => _isFavorite = !_isFavorite),
-                      revealIn: _anim.revealIn,
-                      title: _activePizza.name,
+                    _ExitScale(
+                      animation: _chromeVisibility,
+                      from: 0.9,
+                      child: ProductNavbar(
+                        isFavorite: _isFavorite,
+                        onFavorite: () =>
+                            setState(() => _isFavorite = !_isFavorite),
+                        revealIn: _chromeVisibility,
+                        title: _activePizza.name,
+                      ),
                     ),
                     Expanded(
                       child: SingleChildScrollView(
@@ -159,7 +182,7 @@ class _ProductScreenState extends State<ProductScreen>
                           children: [
                             ScaleFade(
                               animation: _anim.revealIn,
-                              from: 40 / 244,
+                              from: 0.72,
                               child: PizzaStage(
                                 width: width,
                                 selectedSize: _selectedSize,
@@ -172,31 +195,39 @@ class _ProductScreenState extends State<ProductScreen>
                                 hideCenterPizza: _zoomRect != null,
                               ),
                             ),
-                            SlideFade.y(
-                              animation: _anim.springApartIn,
-                              from: 370,
-                              child: SizeArea(
-                                selectedSize: _selectedSize,
-                                onSelect: (size) =>
-                                    setState(() => _selectedSize = size),
+                            _ExitScale(
+                              animation: _bottomVisibility,
+                              from: 0.92,
+                              child: SlideFade.y(
+                                animation: _bottomVisibility,
+                                from: 370,
+                                child: SizeArea(
+                                  selectedSize: _selectedSize,
+                                  onSelect: (size) =>
+                                      setState(() => _selectedSize = size),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 20),
-                            SlideFade.y(
-                              animation: _anim.springApartIn,
-                              from: 250,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                ),
-                                child: CrossFade(
-                                  value: _activePizza.description,
-                                  child: Text(
-                                    _activePizza.description,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      height: 1.7,
-                                      color: AppColors.black,
+                            _ExitScale(
+                              animation: _bottomVisibility,
+                              from: 0.92,
+                              child: SlideFade.y(
+                                animation: _bottomVisibility,
+                                from: 250,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                  ),
+                                  child: CrossFade(
+                                    value: _activePizza.description,
+                                    child: Text(
+                                      _activePizza.description,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        height: 1.7,
+                                        color: AppColors.black,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -207,28 +238,35 @@ class _ProductScreenState extends State<ProductScreen>
                         ),
                       ),
                     ),
-                    SlideFade.y(
-                      animation: _anim.springApartIn,
-                      from: 140,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            QuantityStepper(
-                              quantity: _quantity,
-                              onChanged: (q) => setState(() => _quantity = q),
-                            ),
-                            Text(
-                              '\$${_price.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.black,
+                    _ExitScale(
+                      animation: _bottomVisibility,
+                      from: 0.92,
+                      child: SlideFade.y(
+                        animation: _bottomVisibility,
+                        from: 140,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              QuantityStepper(
+                                quantity: _quantity,
+                                onChanged: (q) => setState(() => _quantity = q),
                               ),
-                            ),
-                            AddButton(onTap: _addToCart),
-                          ],
+                              CrossFade(
+                                value: _selectedSize,
+                                child: Text(
+                                  '\$${_price.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                              ),
+                              AddButton(onTap: _addToCart),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -287,5 +325,27 @@ class _ProductScreenState extends State<ProductScreen>
         ),
       ),
     );
+  }
+}
+
+/// Scales [child] down toward [from] as [animation] recedes from 1 to 0 —
+/// the depth companion to [SlideFade]'s slide+fade, used alongside it
+/// (rather than [ScaleFade], which also drives opacity) so the exiting
+/// chrome reads as receding into the distance, not just sliding off and
+/// fading — while leaving opacity solely to the [SlideFade] it wraps, so
+/// the two don't compound into a fade that's twice as fast as intended.
+class _ExitScale extends AnimatedWidget {
+  const _ExitScale({required Animation<double> animation, required this.from, required this.child})
+    : super(listenable: animation);
+
+  final double from;
+  final Widget child;
+
+  Animation<double> get _animation => listenable as Animation<double>;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = _animation.value;
+    return Transform.scale(scale: from + (1 - from) * value, child: child);
   }
 }

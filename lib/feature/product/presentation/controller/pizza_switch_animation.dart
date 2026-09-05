@@ -16,7 +16,7 @@ class PizzaSwitchAnimation {
       fromIndex = initialIndex,
       toIndex = initialIndex;
 
-  static const _duration = Duration(milliseconds: 380);
+  static const _duration = Duration(milliseconds: 340);
 
   final AnimationController controller;
 

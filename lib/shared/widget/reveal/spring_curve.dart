@@ -48,6 +48,20 @@ class SpringCurve extends Curve {
   factory SpringCurve.snappy({Duration settleDuration = const Duration(milliseconds: 180)}) =>
       SpringCurve(mass: 1, stiffness: 1200, damping: 43, settleDuration: settleDuration);
 
+  /// Tuned much more heavily damped than [elastic] — a ~3.5% overshoot,
+  /// barely-there settle rather than a clearly bouncy one — with its own
+  /// ~340ms natural response time. This is the "fluid, premium iOS" feel
+  /// (think a Photos app image opening full-screen, or a sheet settling
+  /// into place): a quick, smooth rise that's already most of the way
+  /// there by the midpoint, then a gentle glide to rest, rather than a
+  /// springy toy-like bounce. [settleDuration] must be retuned alongside
+  /// stiffness/damping (not just widened) if the target duration changes —
+  /// a spring's physical settle time comes from its own mass/stiffness/
+  /// damping, not from [settleDuration]; widening this past that natural
+  /// settle just adds a frozen hold at the end instead of a slower motion.
+  factory SpringCurve.gentle({Duration settleDuration = const Duration(milliseconds: 340)}) =>
+      SpringCurve(mass: 1, stiffness: 251, damping: 23, settleDuration: settleDuration);
+
   final double mass;
   final double stiffness;
   final double damping;
