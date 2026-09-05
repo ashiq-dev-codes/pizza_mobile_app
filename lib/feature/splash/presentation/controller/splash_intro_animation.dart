@@ -44,8 +44,16 @@ class SplashIntroAnimation {
 
   /// Assembled-logo size, as a fraction of screen width: fixed at the
   /// resting splash-logo size for the whole assembly phase — slices reveal
-  /// in place rather than the logo scaling up as they're added.
-  double assemblySizeFactor(double t) => 0.72;
+  /// in place rather than the logo scaling up as they're added — but once
+  /// whole, it shrinks back down toward nothing over the same window (and
+  /// on the same curve) as [pizzaFadeOpacity]'s fade, so the logo visibly
+  /// shrinks away rather than just fading out at a fixed size.
+  double assemblySizeFactor(double t) {
+    const restingSize = 0.72;
+    if (t < pizzaFadeStart) return restingSize;
+    final localT = ((t - pizzaFadeStart) / (pizzaFadeEnd - pizzaFadeStart)).clamp(0.0, 1.0);
+    return restingSize * (1 - Curves.easeIn.transform(localT));
+  }
 
   /// Fades the assembled logo out once the background starts tinting peach.
   double pizzaFadeOpacity(double t) {
