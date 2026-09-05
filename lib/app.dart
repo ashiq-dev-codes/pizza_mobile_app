@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_mobile_app/feature/splash/presentation/page/splash_page.dart';
 import 'package:pizza_mobile_app/shared/theme/main_theme.dart';
 
 class App extends StatefulWidget {
@@ -16,8 +17,7 @@ class _AppState extends State<App> {
       useInheritedMediaQuery: true,
       debugShowCheckedModeBanner: false,
       theme: MainTheme.mainThemeData(false),
-
-      // Add your screen here
+      home: const SplashScreen(),
     );
   }
 }

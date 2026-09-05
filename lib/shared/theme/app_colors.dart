@@ -4,6 +4,13 @@ class AppColors {
   // Base Colors
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
+  static const Color background = Color(0xFFFFF4ED);
+  // Placeholder brand color pending exact Figma "Accent" style value
+  static const Color primary = Color(0xFFE8562F);
+  // Figma "Accent" style — used for the primary CTA (Add button)
+  static const Color accentBlue = Color(0xFF19C4EA);
+  // Figma "Highlight" style — used behind the quantity stepper
+  static const Color highlightPeach = Color(0xFFF3E3DA);
   // Add your base colors here
 
   // Accent Colors
