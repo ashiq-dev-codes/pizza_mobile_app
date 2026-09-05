@@ -41,20 +41,6 @@ class ProductNavbar extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Align(
-            alignment: Alignment.centerLeft,
-            child: SlideFade.x(
-              animation: revealIn,
-              from: -80,
-              child: RoundIconButton(
-                icon: LucideIcons.arrowLeft,
-                iconColor: AppColors.black,
-                onTap: () {
-                  if (Navigator.canPop(context)) Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
-          Align(
             alignment: Alignment.centerRight,
             child: SlideFade.x(
               animation: revealIn,
