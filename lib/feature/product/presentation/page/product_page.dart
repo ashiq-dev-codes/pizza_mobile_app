@@ -85,7 +85,39 @@ class _ProductScreenState extends State<ProductScreen>
     _zoomAnim.open();
   }
 
-  void _closeZoom() => _zoomAnim.close();
+  void _closeZoom() {
+    HapticFeedback.lightImpact();
+    _zoomAnim.close();
+  }
+
+  void _addToCart() {
+    HapticFeedback.mediumImpact();
+    final pizza = _activePizza;
+    final total = _price * _quantity;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.black,
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        duration: const Duration(milliseconds: 1600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(36)),
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: AppColors.accentBlue, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '$_quantity × ${pizza.name} (${_selectedSize.label}) added — '
+                '\$${total.toStringAsFixed(2)}',
+                style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +227,7 @@ class _ProductScreenState extends State<ProductScreen>
                                 color: AppColors.black,
                               ),
                             ),
-                            AddButton(onTap: () {}),
+                            AddButton(onTap: _addToCart),
                           ],
                         ),
                       ),

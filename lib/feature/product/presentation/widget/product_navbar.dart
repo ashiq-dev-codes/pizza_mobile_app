@@ -4,6 +4,7 @@ import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
 import 'package:pizza_mobile_app/shared/widget/button/round_icon_button.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/cross_fade.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/slide_fade.dart';
+import 'package:pizza_mobile_app/shared/widget/reveal/spring_curve.dart';
 
 /// The product page's top bar: a back button and favorite button converge
 /// in from opposite screen edges while the title drops in from above —
@@ -58,11 +59,7 @@ class ProductNavbar extends StatelessWidget {
             child: SlideFade.x(
               animation: revealIn,
               from: 80,
-              child: RoundIconButton(
-                icon: LucideIcons.heart,
-                iconColor: isFavorite ? AppColors.primary : AppColors.black,
-                onTap: onFavorite,
-              ),
+              child: _FavoriteButton(isFavorite: isFavorite, onTap: onFavorite),
             ),
           ),
           SlideFade.y(
@@ -95,6 +92,66 @@ class ProductNavbar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The favorite heart: pops well past its resting size and springs back
+/// with a slight wobble the instant it's favorited — the same "like button"
+/// bounce iOS users already know — rather than just swapping color flat.
+class _FavoriteButton extends StatefulWidget {
+  const _FavoriteButton({required this.isFavorite, required this.onTap});
+
+  final bool isFavorite;
+  final VoidCallback onTap;
+
+  @override
+  State<_FavoriteButton> createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<_FavoriteButton> with SingleTickerProviderStateMixin {
+  static const _duration = Duration(milliseconds: 420);
+
+  late final _controller = AnimationController(vsync: this, duration: _duration);
+  late final _bounce = TweenSequence<double>([
+    TweenSequenceItem(
+      tween: Tween<double>(begin: 1.0, end: 1.5).chain(CurveTween(curve: Curves.easeOut)),
+      weight: 30,
+    ),
+    TweenSequenceItem(
+      tween: Tween<double>(
+        begin: 1.5,
+        end: 1.0,
+      ).chain(CurveTween(curve: SpringCurve.elastic(settleDuration: const Duration(milliseconds: 300)))),
+      weight: 70,
+    ),
+  ]).animate(_controller);
+
+  @override
+  void didUpdateWidget(covariant _FavoriteButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFavorite && !oldWidget.isFavorite) _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RoundIconButton(
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: _bounce,
+        builder: (context, child) => Transform.scale(scale: _bounce.value, child: child),
+        child: Icon(
+          LucideIcons.heart,
+          size: 22,
+          color: widget.isFavorite ? AppColors.primary : AppColors.black,
+        ),
       ),
     );
   }

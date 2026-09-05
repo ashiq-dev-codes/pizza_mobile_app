@@ -1,10 +1,12 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_catalog.dart';
 import 'package:pizza_mobile_app/feature/product/constant/pizza_size.dart';
 import 'package:pizza_mobile_app/shared/theme/app_colors.dart';
+import 'package:pizza_mobile_app/shared/widget/button/tap_scale.dart';
 import 'package:pizza_mobile_app/shared/widget/reveal/spring_curve.dart';
 
 /// The hero pizza plus its two peeking neighbours. Tapping a peek pulls that
@@ -80,49 +82,70 @@ class PizzaStage extends AnimatedWidget {
     final paintOrder = List<int>.generate(PizzaCatalog.all.length, (i) => i)
       ..sort((a, b) => (a - focus).abs().compareTo((b - focus).abs()));
 
-    return SizedBox(
-      width: width,
-      height: stageHeight,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          for (final i in paintOrder)
-            _stageItem(
-              i,
-              focus,
-              pizzaSize,
-              peekSize,
-              spacing,
-              centerX,
-              centerY,
-              switching,
-            ),
-          Positioned(
-            left: centerX - width * (24 / 375),
-            top: centerY - width * (24 / 375),
-            child: GestureDetector(
-              onTap: onTapZoom,
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 48,
-                      spreadRadius: 0,
-                      offset: Offset(0, 0),
-                      color: AppColors.black.withValues(alpha: 0.33),
+    return GestureDetector(
+      // Translucent rather than the default deferToChild so a swipe started
+      // over the gaps between pizzas (not on an opaque pixel of any of
+      // them) still counts — a decisive horizontal swipe anywhere on the
+      // stage steps the carousel, same as tapping a peek, layered on top of
+      // the source design's tap-only interaction rather than replacing it.
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragEnd: (details) {
+        final velocity = details.primaryVelocity ?? 0;
+        if (velocity.abs() < 200) return;
+        final next = toIndex + (velocity < 0 ? 1 : -1);
+        if (next < 0 || next >= PizzaCatalog.all.length) return;
+        HapticFeedback.selectionClick();
+        onSelectIndex(next);
+      },
+      child: SizedBox(
+        width: width,
+        height: stageHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (final i in paintOrder)
+              _stageItem(
+                i,
+                focus,
+                pizzaSize,
+                peekSize,
+                spacing,
+                centerX,
+                centerY,
+                switching,
+              ),
+            Positioned(
+              left: centerX - width * (24 / 375),
+              top: centerY - width * (24 / 375),
+              child: TapScale(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                    onTapZoom();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 48,
+                          spreadRadius: 0,
+                          offset: Offset(0, 0),
+                          color: AppColors.black.withValues(alpha: 0.33),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Icon(
-                  LucideIcons.search200,
-                  size: width * (48 / 375),
-                  color: AppColors.white,
-                  shadows: const [Shadow(color: Colors.black38, blurRadius: 6)],
+                    child: Icon(
+                      LucideIcons.search200,
+                      size: width * (48 / 375),
+                      color: AppColors.white,
+                      shadows: const [Shadow(color: Colors.black38, blurRadius: 6)],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -166,9 +189,15 @@ class PizzaStage extends AnimatedWidget {
     );
 
     final onTap = i == toIndex
-        ? onTapZoom
+        ? () {
+            HapticFeedback.mediumImpact();
+            onTapZoom();
+          }
         : (i - toIndex).abs() == 1
-        ? () => onSelectIndex(i)
+        ? () {
+            HapticFeedback.selectionClick();
+            onSelectIndex(i);
+          }
         : null;
 
     // The Positioned box would otherwise snap straight to `size` on the very
@@ -190,10 +219,14 @@ class PizzaStage extends AnimatedWidget {
       height: boxExtent,
       child: Opacity(
         opacity: opacity,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: atRestCenter ? Center(child: image) : image,
+        child: TapScale(
+          enabled: onTap != null,
+          pressedScale: 0.95,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: atRestCenter ? Center(child: image) : image,
+          ),
         ),
       ),
     );
