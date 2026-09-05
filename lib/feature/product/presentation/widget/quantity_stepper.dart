@@ -35,8 +35,13 @@ class QuantityStepper extends StatelessWidget {
                 duration: _digitDuration,
                 switchInCurve: SpringCurve.elastic(settleDuration: _digitDuration),
                 switchOutCurve: Curves.easeIn,
+                // `animation` is already curved through SpringCurve.elastic
+                // above, which deliberately overshoots past 1.0 — safe to
+                // feed straight into FadeTransition/SlideTransition (they
+                // only ever lerp), but NOT into another Curve/CurveTween,
+                // whose `transform` asserts its input stays within 0-1.
                 transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation.drive(CurveTween(curve: const Interval(0, 0.6))),
+                  opacity: animation,
                   child: SlideTransition(
                     position: Tween<Offset>(begin: const Offset(0, 0.6), end: Offset.zero)
                         .animate(animation),

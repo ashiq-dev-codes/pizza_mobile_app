@@ -41,9 +41,15 @@ class _TapScaleState extends State<TapScale> with SingleTickerProviderStateMixin
 
   static const _releaseDuration = Duration(milliseconds: 260);
 
-  late final Animation<double> _scale = _controller
-      .drive(CurveTween(curve: Curves.easeOut))
-      .drive(Tween<double>(begin: 1, end: widget.pressedScale));
+  // A plain Tween, not a CurveTween: `_controller.value` is already shaped
+  // by whatever curve `animateTo` below was given — including [SpringCurve]
+  // legitimately overshooting past 1.0/undershooting past 0.0 mid-recoil —
+  // and re-running an out-of-range value through another `Curve.transform`
+  // trips its internal 0-1 assertion. A [Tween] just lerps, so it carries
+  // that overshoot straight through instead of asserting on it.
+  late final Animation<double> _scale = _controller.drive(
+    Tween<double>(begin: 1, end: widget.pressedScale),
+  );
 
   @override
   void dispose() {
